@@ -4,8 +4,6 @@ import { aiConfig } from "../config/ai";
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! });
 
 export async function interpretDream(dream: string): Promise<string> {
-  console.log("response", client);
-
   const response = await client.messages.create({
     model: aiConfig.model,
     max_tokens: aiConfig.maxTokens,

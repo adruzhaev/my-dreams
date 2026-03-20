@@ -1,24 +1,44 @@
 import { db } from "../db";
-import { dreams } from "../db/schema";
+import { dreams, interpretations } from "../db/schema";
 import { desc, eq } from "drizzle-orm";
+import { findOrCreateUser } from "./user";
 
 export async function saveDream(
   telegramUserId: number,
-  dream: string,
-  interpretation: string,
+  username: string | undefined,
+  dreamText: string,
+  jungian: string,
+  freudian: string,
+  symbolic: string,
+  rawResponse: string,
 ) {
-  await db.insert(dreams).values({
-    telegramUserId,
-    dream,
-    interpretation,
-  });
+  const user = await findOrCreateUser(telegramUserId, username);
+
+  const [dream] = await db
+    .insert(dreams)
+    .values({ userId: user.telegramUserId, dream: dreamText })
+    .returning();
+
+  await db
+    .insert(interpretations)
+    .values({ dreamId: dream.id, jungian, freudian, symbolic, rawResponse });
+
+  return dream;
 }
 
 export async function getRecentDreams(telegramUserId: number, limit = 10) {
   return db
-    .select()
+    .select({
+      id: dreams.id,
+      dream: dreams.dream,
+      createdAt: dreams.createdAt,
+      jungian: interpretations.jungian,
+      freudian: interpretations.freudian,
+      symbolic: interpretations.symbolic,
+    })
     .from(dreams)
-    .where(eq(dreams.telegramUserId, telegramUserId))
+    .innerJoin(interpretations, eq(interpretations.dreamId, dreams.id))
+    .where(eq(dreams.userId, telegramUserId))
     .orderBy(desc(dreams.createdAt))
     .limit(limit);
 }
