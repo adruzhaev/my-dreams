@@ -1,6 +1,7 @@
 import "dotenv/config";
 
 import { Bot } from "grammy";
+import { run } from "@grammyjs/runner";
 import { startHandler } from "./handlers/start";
 import { dreamHandler } from "./handlers/dream";
 
@@ -13,5 +14,5 @@ bot.use(loggerMiddleware);
 bot.command("start", startHandler);
 bot.on("message:text", dreamHandler);
 
-bot.start();
+run(bot);
 console.log("Dream bot is running...");

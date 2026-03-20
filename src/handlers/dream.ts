@@ -4,6 +4,8 @@ import { interpretDream } from "../services/ai";
 import { saveDream } from "../services/dream";
 import { parseInterpretation } from "../utils/parse";
 
+const processingUsers = new Set<number>();
+
 export async function dreamHandler(ctx: Context) {
   const dream = ctx.message?.text;
   const userId = ctx.from?.id;
@@ -11,6 +13,9 @@ export async function dreamHandler(ctx: Context) {
 
   if (!dream || !userId) return;
 
+  if (processingUsers.has(userId)) return;
+
+  processingUsers.add(userId);
   await ctx.reply("🔮 Interpreting your dream...");
 
   try {
@@ -34,5 +39,7 @@ export async function dreamHandler(ctx: Context) {
     } else {
       await ctx.reply("😵 Something unexpected happened. Please try again.");
     }
+  } finally {
+    processingUsers.delete(userId);
   }
 }
