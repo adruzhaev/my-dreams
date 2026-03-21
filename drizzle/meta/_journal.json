@@ -8,6 +8,13 @@
       "when": 1774031758160,
       "tag": "0000_loud_radioactive_man",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1774111767073,
+      "tag": "0001_tearful_nuke",
+      "breakpoints": true
     }
   ]
 }

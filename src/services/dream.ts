@@ -2,14 +2,13 @@ import { db } from "../db";
 import { dreamImages, dreams, interpretations } from "../db/schema";
 import { desc, eq } from "drizzle-orm";
 import { findOrCreateUser } from "./user";
+import { Interpretation } from "../utils/parse";
 
 export async function saveDream(
   telegramUserId: number,
   username: string | undefined,
   dreamText: string,
-  jungian: string,
-  freudian: string,
-  symbolic: string,
+  interpretation: Interpretation,
   rawResponse: string,
 ) {
   const user = await findOrCreateUser(telegramUserId, username);
@@ -19,9 +18,16 @@ export async function saveDream(
     .values({ userId: user.telegramUserId, dream: dreamText })
     .returning();
 
-  await db
-    .insert(interpretations)
-    .values({ dreamId: dream.id, jungian, freudian, symbolic, rawResponse });
+  await db.insert(interpretations).values({
+    dreamId: dream.id,
+    jungian: interpretation.jungian,
+    freudian: interpretation.freudian,
+    symbolic: interpretation.symbolic,
+    symbols: interpretation.symbols,
+    emotions: interpretation.emotions,
+    themes: interpretation.themes,
+    rawResponse,
+  });
 
   return dream;
 }

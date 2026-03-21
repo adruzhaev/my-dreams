@@ -38,6 +38,9 @@ export const interpretations = pgTable("interpretations", {
   jungian: text("jungian").notNull(),
   freudian: text("freudian").notNull(),
   symbolic: text("symbolic").notNull(),
+  symbols: text("symbols").array().notNull().default([]),
+  emotions: text("emotions").array().notNull().default([]),
+  themes: text("themes").array().notNull().default([]),
   rawResponse: text("raw_response").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
