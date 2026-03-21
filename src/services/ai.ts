@@ -1,4 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
+import OpenAI from "openai";
+
 import { aiConfig } from "../config/ai";
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! });
@@ -14,4 +16,22 @@ export async function interpretDream(dream: string): Promise<string> {
   return response.content[0].type === "text"
     ? response.content[0].text
     : "Could not interpret dream.";
+}
+
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+export async function generateImage(dream: string): Promise<string> {
+  const prompt = `This is a dream description. Don't use any words, rely on a dream a base of the image. Here is the dream: ${dream}.`;
+
+  const response = await openai.images.generate({
+    model: "dall-e-3",
+    prompt,
+    n: 1,
+    size: "1024x1024",
+    quality: "standard",
+  });
+
+  const url = response.data?.[0]?.url;
+  if (!url) throw new Error("No image URL returned from DALL-E");
+  return url;
 }

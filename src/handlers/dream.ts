@@ -3,6 +3,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { interpretDream } from "../services/ai";
 import { saveDream } from "../services/dream";
 import { parseInterpretation } from "../utils/parse";
+import { generateDreamImage } from "./image";
 
 const processingUsers = new Set<number>();
 
@@ -22,7 +23,7 @@ export async function dreamHandler(ctx: Context) {
     const rawResponse = await interpretDream(dream);
     const { jungian, freudian, symbolic } = parseInterpretation(rawResponse);
 
-    await saveDream(
+    const dreamRecord = await saveDream(
       userId,
       username,
       dream,
@@ -32,6 +33,8 @@ export async function dreamHandler(ctx: Context) {
       rawResponse,
     );
     await ctx.reply(rawResponse, { parse_mode: "Markdown" });
+
+    await generateDreamImage(ctx, dream, dreamRecord.id);
   } catch (error) {
     if (error instanceof Anthropic.APIError) {
       const userMessage = `⚠️ AI error: ${error.error?.error?.message}`;

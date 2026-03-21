@@ -1,5 +1,5 @@
 import { db } from "../db";
-import { dreams, interpretations } from "../db/schema";
+import { dreamImages, dreams, interpretations } from "../db/schema";
 import { desc, eq } from "drizzle-orm";
 import { findOrCreateUser } from "./user";
 
