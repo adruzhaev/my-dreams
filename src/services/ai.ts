@@ -9,7 +9,13 @@ export async function interpretDream(dream: string): Promise<string> {
   const response = await client.messages.create({
     model: aiConfig.model,
     max_tokens: aiConfig.maxTokens,
-    system: aiConfig.systemPrompt,
+    system: [
+      {
+        type: "text",
+        text: aiConfig.systemPrompt,
+        cache_control: { type: "ephemeral" },
+      },
+    ],
     messages: [{ role: "user", content: `I had this dream: ${dream}` }],
   });
 
@@ -21,7 +27,10 @@ export async function interpretDream(dream: string): Promise<string> {
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 export async function generateImage(dream: string): Promise<string> {
-  const prompt = `This is a dream description. Don't use any words, rely on a dream a base of the image. Here is the dream: ${dream}.`;
+  const prompt = `
+    This is a dream description. Don't use any words, rely on a dream a base of the image. 
+    Image should not be realistic, use minimalistic approach. Here is the dream: ${dream}.
+  `;
 
   const response = await openai.images.generate({
     model: "dall-e-3",
