@@ -16,5 +16,18 @@ bot.command("start", startHandler);
 bot.on("message:text", dreamHandler);
 bot.on("message:voice", voiceHandler);
 
-run(bot);
+bot.catch((err) => {
+  const ctx = err.ctx;
+  console.error("Unhandled error:", {
+    error: err.error,
+    update: ctx.update,
+  });
+
+  ctx.reply("😵 Something went wrong. Please try again.").catch(() => {});
+});
+
+const runner = run(bot);
 console.log("Dream bot is running...");
+
+process.once("SIGINT", () => runner.stop());
+process.once("SIGTERM", () => runner.stop());
