@@ -11,6 +11,7 @@ import { reportHandler } from "./handlers/report";
 import { loggerMiddleware } from "./middleware/logger";
 import { PostgresSessionStorage } from "./db/session-storage";
 import { MyContext, SessionData } from "./types/context";
+import { botCommands } from "./config/commands";
 
 const bot = new Bot<MyContext>(process.env.TELEGRAM_BOT_TOKEN!);
 
@@ -51,6 +52,10 @@ bot.catch((err) => {
 
   ctx.reply(ctx.t("error-global")).catch(() => {});
 });
+
+for (const { lang, commands } of botCommands) {
+  bot.api.setMyCommands(commands, lang === "en" ? {} : { language_code: lang });
+}
 
 const runner = run(bot);
 console.log("Dream bot is running...");
