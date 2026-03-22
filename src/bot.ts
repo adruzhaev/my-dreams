@@ -2,6 +2,7 @@ import "dotenv/config";
 
 import { Bot, session } from "grammy";
 import { run } from "@grammyjs/runner";
+import { I18n } from "@grammyjs/i18n";
 import { startHandler } from "./handlers/start";
 import { dreamHandler } from "./handlers/dream";
 import { voiceHandler } from "./handlers/voice";
@@ -11,6 +12,12 @@ import { MyContext, SessionData } from "./types/context";
 
 const bot = new Bot<MyContext>(process.env.TELEGRAM_BOT_TOKEN!);
 
+const i18n = new I18n<MyContext>({
+  defaultLocale: "en",
+  directory: "locales",
+});
+
+bot.use(i18n);
 bot.use(
   session<SessionData, MyContext>({
     initial: () => ({ messages: [], dreamId: null }),
@@ -30,7 +37,7 @@ bot.callbackQuery("new_dream", async (ctx) => {
   session.messages = [];
   session.dreamId = null;
   await answerCallbackQuery();
-  await reply("✨ Ready for your next dream. Share it whenever you're ready.");
+  await reply(ctx.t("new-dream-ready"));
 });
 
 bot.catch((err) => {
@@ -40,7 +47,7 @@ bot.catch((err) => {
     update: ctx.update,
   });
 
-  ctx.reply("😵 Something went wrong. Please try again.").catch(() => {});
+  ctx.reply(ctx.t("error-global")).catch(() => {});
 });
 
 const runner = run(bot);

@@ -18,17 +18,23 @@ export async function voiceHandler(ctx: MyContext) {
   if (processingUsers.has(userId)) return;
 
   processingUsers.add(userId);
-  await ctx.reply("🎙️ Transcribing your dream...");
+  await ctx.reply(ctx.t("transcribing"));
 
   try {
     const dream = await transcribeVoice(ctx.api, fileId);
-    await ctx.reply("🔮 Interpreting your dream...");
+    await ctx.reply(ctx.t("interpreting"));
 
     const rawResponse = await interpretDream(dream);
     const interpretation = parseInterpretation(rawResponse);
     const formatted = formatInterpretation(interpretation);
 
-    const dreamRecord = await saveDream(userId, username, dream, interpretation, rawResponse);
+    const dreamRecord = await saveDream(
+      userId,
+      username,
+      dream,
+      interpretation,
+      rawResponse,
+    );
 
     ctx.session.messages = [
       { role: "user", content: `I had this dream: ${dream}` },
@@ -41,10 +47,12 @@ export async function voiceHandler(ctx: MyContext) {
     await generateDreamImage(ctx, dream, dreamRecord.id);
   } catch (error) {
     if (error instanceof Anthropic.APIError) {
-      await ctx.reply(`⚠️ AI error: ${error.error?.error?.message}`);
+      await ctx.reply(
+        ctx.t("error-ai", { message: error.error?.error?.message }),
+      );
     } else {
       console.error("Unexpected error in voiceHandler:", error);
-      await ctx.reply("😵 Something unexpected happened. Please try again.");
+      await ctx.reply(ctx.t("error-unexpected"));
     }
   } finally {
     processingUsers.delete(userId);

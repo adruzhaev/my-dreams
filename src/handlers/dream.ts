@@ -36,7 +36,7 @@ async function handleNewDream(
   userId: number,
   username: string | undefined,
 ) {
-  await ctx.reply("🔮 Interpreting your dream...");
+  await ctx.reply(ctx.t("interpreting"));
 
   try {
     const rawResponse = await interpretDream(dream);
@@ -62,16 +62,18 @@ async function handleNewDream(
     await generateDreamImage(ctx, dream, dreamRecord.id);
   } catch (error) {
     if (error instanceof Anthropic.APIError) {
-      await ctx.reply(`⚠️ AI error: ${error.error?.error?.message}`);
+      await ctx.reply(
+        ctx.t("error-ai", { message: error.error?.error?.message }),
+      );
     } else {
       console.error("Unexpected error in handleNewDream:", error);
-      await ctx.reply("😵 Something unexpected happened. Please try again.");
+      await ctx.reply(ctx.t("error-unexpected"));
     }
   }
 }
 
 async function handleFollowUp(ctx: MyContext, question: string) {
-  await ctx.reply("💭 Thinking...");
+  await ctx.reply(ctx.t("thinking"));
 
   try {
     const messages = [
@@ -87,14 +89,16 @@ async function handleFollowUp(ctx: MyContext, question: string) {
 
     await ctx.reply(answer, {
       parse_mode: "Markdown",
-      reply_markup: newDreamKeyboard,
+      reply_markup: newDreamKeyboard(ctx),
     });
   } catch (error) {
     if (error instanceof Anthropic.APIError) {
-      await ctx.reply(`⚠️ AI error: ${error.error?.error?.message}`);
+      await ctx.reply(
+        ctx.t("error-ai", { message: error.error?.error?.message }),
+      );
     } else {
       console.error("Unexpected error in handleFollowUp:", error);
-      await ctx.reply("😵 Something unexpected happened. Please try again.");
+      await ctx.reply(ctx.t("error-unexpected"));
     }
   }
 }

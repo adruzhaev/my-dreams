@@ -22,7 +22,9 @@ export async function interpretDream(dream: string): Promise<string> {
 
   return response.content[0].type === "text"
     ? response.content[0].text
-    : "Could not interpret dream.";
+    : (() => {
+        throw new Error("Unexpected response type from Claude");
+      })();
 }
 
 export async function followUpDream(messages: Message[]): Promise<string> {
@@ -41,7 +43,9 @@ export async function followUpDream(messages: Message[]): Promise<string> {
 
   return response.content[0].type === "text"
     ? response.content[0].text
-    : "Could not answer follow-up.";
+    : (() => {
+        throw new Error("Unexpected response type from Claude");
+      })();
 }
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });

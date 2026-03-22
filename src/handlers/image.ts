@@ -9,13 +9,13 @@ export async function generateDreamImage(
   dreamId: number,
 ): Promise<void> {
   try {
-    await ctx.reply("🎨 Generating your dream image...");
+    await ctx.reply(ctx.t("generating-image"));
 
     const imageUrl = await generateImage(dream);
 
     await saveDreamImage(dreamId, imageUrl, dream);
 
-    await ctx.replyWithPhoto(imageUrl, { reply_markup: newDreamKeyboard });
+    await ctx.replyWithPhoto(imageUrl, { reply_markup: newDreamKeyboard(ctx) });
   } catch (error) {
     console.error("Image generation failed (non-fatal):", error);
   }

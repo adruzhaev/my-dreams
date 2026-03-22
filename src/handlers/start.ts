@@ -1,11 +1,6 @@
-import { Context } from "grammy";
+import { MyContext } from "../types/context";
 
-export async function startHandler(ctx: Context) {
-  await ctx.reply(
-    "🌙 *Welcome to your Dream Interpreter*\n\n" +
-      "Tell me any dream and I'll interpret it through three lenses:\n" +
-      "🧠 Jungian · 💭 Freudian · 🔮 Symbolic\n\n" +
-      "Just type your dream whenever you're ready.",
-    { parse_mode: "Markdown" },
-  );
+export async function startHandler(ctx: MyContext) {
+  console.log("ctx.from.language_code: ", ctx?.from?.language_code);
+  await ctx.reply(ctx.t("welcome"), { parse_mode: "Markdown" });
 }
