@@ -5,6 +5,7 @@ import {
   timestamp,
   bigint,
   index,
+  jsonb,
 } from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
@@ -43,6 +44,12 @@ export const interpretations = pgTable("interpretations", {
   themes: text("themes").array().notNull().default([]),
   rawResponse: text("raw_response").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const sessions = pgTable("sessions", {
+  key: text("key").primaryKey(),
+  value: jsonb("value").notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
 export const dreamImages = pgTable("dream_images", {

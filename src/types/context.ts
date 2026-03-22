@@ -1,0 +1,13 @@
+import { Context, SessionFlavor } from "grammy";
+
+export type Message = {
+  role: "user" | "assistant";
+  content: string;
+};
+
+export type SessionData = {
+  messages: Message[];
+  dreamId: number | null;
+};
+
+export type MyContext = Context & SessionFlavor<SessionData>;

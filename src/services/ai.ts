@@ -2,6 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import OpenAI from "openai";
 
 import { aiConfig } from "../config/ai";
+import { Message } from "../types/context";
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! });
 
@@ -22,6 +23,25 @@ export async function interpretDream(dream: string): Promise<string> {
   return response.content[0].type === "text"
     ? response.content[0].text
     : "Could not interpret dream.";
+}
+
+export async function followUpDream(messages: Message[]): Promise<string> {
+  const response = await client.messages.create({
+    model: aiConfig.model,
+    max_tokens: aiConfig.maxTokens,
+    system: [
+      {
+        type: "text",
+        text: aiConfig.followUpSystemPrompt,
+        cache_control: { type: "ephemeral" },
+      },
+    ],
+    messages,
+  });
+
+  return response.content[0].type === "text"
+    ? response.content[0].text
+    : "Could not answer follow-up.";
 }
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });

@@ -1,20 +1,37 @@
 import "dotenv/config";
 
-import { Bot } from "grammy";
+import { Bot, session } from "grammy";
 import { run } from "@grammyjs/runner";
 import { startHandler } from "./handlers/start";
 import { dreamHandler } from "./handlers/dream";
 import { voiceHandler } from "./handlers/voice";
-
 import { loggerMiddleware } from "./middleware/logger";
+import { PostgresSessionStorage } from "./db/session-storage";
+import { MyContext, SessionData } from "./types/context";
 
-const bot = new Bot(process.env.TELEGRAM_BOT_TOKEN!);
+const bot = new Bot<MyContext>(process.env.TELEGRAM_BOT_TOKEN!);
+
+bot.use(
+  session<SessionData, MyContext>({
+    initial: () => ({ messages: [], dreamId: null }),
+    storage: new PostgresSessionStorage(),
+  }),
+);
 
 bot.use(loggerMiddleware);
 
 bot.command("start", startHandler);
 bot.on("message:text", dreamHandler);
 bot.on("message:voice", voiceHandler);
+
+bot.callbackQuery("new_dream", async (ctx) => {
+  const { session, answerCallbackQuery, reply } = ctx;
+
+  session.messages = [];
+  session.dreamId = null;
+  await answerCallbackQuery();
+  await reply("✨ Ready for your next dream. Share it whenever you're ready.");
+});
 
 bot.catch((err) => {
   const ctx = err.ctx;
