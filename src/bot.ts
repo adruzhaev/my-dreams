@@ -34,12 +34,10 @@ bot.on("message:text", dreamHandler);
 bot.on("message:voice", voiceHandler);
 
 bot.callbackQuery("new_dream", async (ctx) => {
-  const { session, answerCallbackQuery, reply } = ctx;
-
-  session.messages = [];
-  session.dreamId = null;
-  await answerCallbackQuery();
-  await reply(ctx.t("new-dream-ready"));
+  ctx.session.messages = [];
+  ctx.session.dreamId = null;
+  await ctx.answerCallbackQuery();
+  await ctx.reply(ctx.t("new-dream-ready"));
 });
 
 bot.catch((err) => {
