@@ -6,6 +6,7 @@ import { I18n } from "@grammyjs/i18n";
 import { startHandler } from "./handlers/start";
 import { dreamHandler } from "./handlers/dream";
 import { voiceHandler } from "./handlers/voice";
+import { searchHandler } from "./handlers/search";
 import { loggerMiddleware } from "./middleware/logger";
 import { PostgresSessionStorage } from "./db/session-storage";
 import { MyContext, SessionData } from "./types/context";
@@ -28,6 +29,7 @@ bot.use(
 bot.use(loggerMiddleware);
 
 bot.command("start", startHandler);
+bot.command("search", searchHandler);
 bot.on("message:text", dreamHandler);
 bot.on("message:voice", voiceHandler);
 

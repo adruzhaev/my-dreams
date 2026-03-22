@@ -50,6 +50,14 @@ export async function followUpDream(messages: Message[]): Promise<string> {
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
+export async function generateEmbedding(text: string): Promise<number[]> {
+  const response = await openai.embeddings.create({
+    model: "text-embedding-3-small",
+    input: text,
+  });
+  return response.data[0].embedding;
+}
+
 export async function generateImage(dream: string): Promise<string> {
   const prompt = `
     This is a dream description. Don't use any words, rely on a dream a base of the image. 

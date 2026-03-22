@@ -17,6 +17,12 @@ generating-image = 🎨 Generating your dream image...
 new-dream-button = 🌙 New Dream
 new-dream-ready = ✨ Ready for your next dream. Share it whenever you're ready.
 
+# Search
+search-usage = 🔍 Usage: `/search <query>` — e.g. `/search flying over water`
+search-searching = 🔍 Searching your dreams...
+search-no-results = No matching dreams found. Try a different query or log more dreams first.
+search-results-header = 🔍 *Most similar dreams:*
+
 # Errors
 error-ai = ⚠️ AI error: { $message }
 error-unexpected = 😵 Something unexpected happened. Please try again.

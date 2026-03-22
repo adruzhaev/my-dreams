@@ -17,6 +17,12 @@ generating-image = 🎨 Генерирую образ твоего сна...
 new-dream-button = 🌙 Новый сон
 new-dream-ready = ✨ Готов к твоему следующему сну. Делись, когда будешь готов.
 
+# Search
+search-usage = 🔍 Использование: `/search <запрос>` — например `/search полёт над водой`
+search-searching = 🔍 Ищу похожие сны...
+search-no-results = Похожих снов не найдено. Попробуй другой запрос или запиши больше снов.
+search-results-header = 🔍 *Похожие сны:*
+
 # Errors
 error-ai = ⚠️ Ошибка ИИ: { $message }
 error-unexpected = 😵 Что-то пошло не так. Пожалуйста, попробуй снова.

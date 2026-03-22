@@ -1,8 +1,20 @@
-import { db } from "../db";
+import { db, sql } from "../db";
 import { dreamImages, dreams, interpretations } from "../db/schema";
 import { desc, eq } from "drizzle-orm";
 import { findOrCreateUser } from "./user";
 import { Interpretation } from "../utils/parse";
+import { generateEmbedding } from "./ai";
+
+function buildEmbeddingText(dreamText: string, interpretation: Interpretation): string {
+  const parts = [`Dream: ${dreamText}`];
+  if (interpretation.themes.length > 0) parts.push(`Themes: ${interpretation.themes.join(", ")}`);
+  if (interpretation.emotions.length > 0) parts.push(`Emotions: ${interpretation.emotions.join(", ")}`);
+  if (interpretation.symbols.length > 0) parts.push(`Symbols: ${interpretation.symbols.join(", ")}`);
+  parts.push(`Jungian: ${interpretation.jungian}`);
+  parts.push(`Freudian: ${interpretation.freudian}`);
+  parts.push(`Symbolic: ${interpretation.symbolic}`);
+  return parts.join("\n");
+}
 
 export async function saveDream(
   telegramUserId: number,
@@ -13,23 +25,51 @@ export async function saveDream(
 ) {
   const user = await findOrCreateUser(telegramUserId, username);
 
+  const embeddingText = buildEmbeddingText(dreamText, interpretation);
+  const embedding = await generateEmbedding(embeddingText);
+
   const [dream] = await db
     .insert(dreams)
-    .values({ userId: user.telegramUserId, dream: dreamText })
+    .values({ userId: user.telegramUserId, dream: dreamText, embedding })
     .returning();
 
   await db.insert(interpretations).values({
     dreamId: dream.id,
-    jungian: interpretation.jungian,
-    freudian: interpretation.freudian,
-    symbolic: interpretation.symbolic,
-    symbols: interpretation.symbols,
-    emotions: interpretation.emotions,
-    themes: interpretation.themes,
     rawResponse,
+    ...interpretation,
   });
 
   return dream;
+}
+
+export type SearchResult = {
+  id: number;
+  dream: string;
+  createdAt: Date;
+  jungian: string;
+  themes: string[];
+  emotions: string[];
+};
+
+export async function searchDreams(
+  telegramUserId: number,
+  query: string,
+  limit = 5,
+): Promise<SearchResult[]> {
+  const queryEmbedding = await generateEmbedding(query);
+  const vectorStr = `[${queryEmbedding.join(",")}]`;
+
+  const results = await sql<SearchResult[]>`
+    SELECT d.id, d.dream, d.created_at AS "createdAt",
+           i.jungian, i.themes, i.emotions
+    FROM dreams d
+    JOIN interpretations i ON i.dream_id = d.id
+    WHERE d.user_id = ${telegramUserId} AND d.embedding IS NOT NULL
+    ORDER BY d.embedding <=> ${vectorStr}::vector
+    LIMIT ${limit}
+  `;
+
+  return results;
 }
 
 export async function getRecentDreams(telegramUserId: number, limit = 10) {

@@ -10,11 +10,13 @@ export class PostgresSessionStorage<T> implements StorageAdapter<T> {
   }
 
   async write(key: string, value: T): Promise<void> {
+    const json = JSON.stringify(value);
+
     await sql`
       INSERT INTO sessions (key, value, updated_at)
-      VALUES (${key}, ${JSON.stringify(value)}, NOW())
+      VALUES (${key}, ${json}::jsonb, NOW())
       ON CONFLICT (key) DO UPDATE
-      SET value = ${JSON.stringify(value)}, updated_at = NOW()
+      SET value = ${json}::jsonb, updated_at = NOW()
     `;
   }
 
