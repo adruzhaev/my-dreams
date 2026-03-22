@@ -48,6 +48,27 @@ export async function followUpDream(messages: Message[]): Promise<string> {
       })();
 }
 
+export async function generateBatchAnalysis(prompt: string): Promise<string> {
+  const response = await client.messages.create({
+    model: aiConfig.model,
+    max_tokens: 2000,
+    system: [
+      {
+        type: "text",
+        text: aiConfig.batchAnalysisSystemPrompt,
+        cache_control: { type: "ephemeral" },
+      },
+    ],
+    messages: [{ role: "user", content: prompt }],
+  });
+
+  return response.content[0].type === "text"
+    ? response.content[0].text
+    : (() => {
+        throw new Error("Unexpected response type from Claude");
+      })();
+}
+
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 export async function generateEmbedding(text: string): Promise<number[]> {

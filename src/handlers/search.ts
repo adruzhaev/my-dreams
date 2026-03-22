@@ -25,7 +25,7 @@ export async function searchHandler(ctx: MyContext) {
   const lines: string[] = [ctx.t("search-results-header")];
 
   for (const [i, r] of results.entries()) {
-    const date = r.createdAt.toLocaleDateString("en-GB", {
+    const date = new Date(r.createdAt).toLocaleDateString("en-GB", {
       day: "numeric",
       month: "short",
       year: "numeric",

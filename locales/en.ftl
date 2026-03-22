@@ -23,6 +23,13 @@ search-searching = 🔍 Searching your dreams...
 search-no-results = No matching dreams found. Try a different query or log more dreams first.
 search-results-header = 🔍 *Most similar dreams:*
 
+# Report
+report-usage = Usage: `/report` or `/report <days>` — e.g. `/report 7`
+report-generating = 📊 Generating your { $days }-day dream report...
+report-no-dreams = No dreams recorded in the last { $days } days.
+report-header = 🌙 *Dream Report — last { $days } days ({ $count } dreams)*
+report-stats = 📊 *Frequencies:*
+
 # Errors
 error-ai = ⚠️ AI error: { $message }
 error-unexpected = 😵 Something unexpected happened. Please try again.

@@ -1,15 +1,21 @@
 import { db, sql } from "../db";
-import { dreamImages, dreams, interpretations } from "../db/schema";
-import { desc, eq } from "drizzle-orm";
+import { dreams, interpretations } from "../db/schema";
+import { and, desc, eq, gte } from "drizzle-orm";
 import { findOrCreateUser } from "./user";
 import { Interpretation } from "../utils/parse";
 import { generateEmbedding } from "./ai";
 
-function buildEmbeddingText(dreamText: string, interpretation: Interpretation): string {
+function buildEmbeddingText(
+  dreamText: string,
+  interpretation: Interpretation,
+): string {
   const parts = [`Dream: ${dreamText}`];
-  if (interpretation.themes.length > 0) parts.push(`Themes: ${interpretation.themes.join(", ")}`);
-  if (interpretation.emotions.length > 0) parts.push(`Emotions: ${interpretation.emotions.join(", ")}`);
-  if (interpretation.symbols.length > 0) parts.push(`Symbols: ${interpretation.symbols.join(", ")}`);
+  if (interpretation.themes.length > 0)
+    parts.push(`Themes: ${interpretation.themes.join(", ")}`);
+  if (interpretation.emotions.length > 0)
+    parts.push(`Emotions: ${interpretation.emotions.join(", ")}`);
+  if (interpretation.symbols.length > 0)
+    parts.push(`Symbols: ${interpretation.symbols.join(", ")}`);
   parts.push(`Jungian: ${interpretation.jungian}`);
   parts.push(`Freudian: ${interpretation.freudian}`);
   parts.push(`Symbolic: ${interpretation.symbolic}`);
@@ -45,7 +51,7 @@ export async function saveDream(
 export type SearchResult = {
   id: number;
   dream: string;
-  createdAt: Date;
+  createdAt: string;
   jungian: string;
   themes: string[];
   emotions: string[];
@@ -70,6 +76,27 @@ export async function searchDreams(
   `;
 
   return results;
+}
+
+export async function getDreamsForReport(telegramUserId: number, days: number) {
+  const since = new Date();
+  since.setDate(since.getDate() - days);
+
+  return db
+    .select({
+      dream: dreams.dream,
+      createdAt: dreams.createdAt,
+      jungian: interpretations.jungian,
+      freudian: interpretations.freudian,
+      symbolic: interpretations.symbolic,
+      symbols: interpretations.symbols,
+      emotions: interpretations.emotions,
+      themes: interpretations.themes,
+    })
+    .from(dreams)
+    .innerJoin(interpretations, eq(interpretations.dreamId, dreams.id))
+    .where(and(eq(dreams.userId, telegramUserId), gte(dreams.createdAt, since)))
+    .orderBy(dreams.createdAt);
 }
 
 export async function getRecentDreams(telegramUserId: number, limit = 10) {

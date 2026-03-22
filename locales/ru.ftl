@@ -23,6 +23,13 @@ search-searching = 🔍 Ищу похожие сны...
 search-no-results = Похожих снов не найдено. Попробуй другой запрос или запиши больше снов.
 search-results-header = 🔍 *Похожие сны:*
 
+# Report
+report-usage = Использование: `/report` или `/report <дни>` — например `/report 7`
+report-generating = 📊 Генерирую отчёт за { $days } дней...
+report-no-dreams = За последние { $days } дней снов не записано.
+report-header = 🌙 *Отчёт о снах — последние { $days } дней ({ $count } снов)*
+report-stats = 📊 *Частота:*
+
 # Errors
 error-ai = ⚠️ Ошибка ИИ: { $message }
 error-unexpected = 😵 Что-то пошло не так. Пожалуйста, попробуй снова.
